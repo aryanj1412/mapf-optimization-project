@@ -134,10 +134,10 @@ Optimality: ✓ Guaranteed optimal
 
 
 LaCAM2_Baseline
-├── MAPF_LaCAM2_Guided_Demo.ipynb # Complete implementation notebook
-├── lacam2_problem_setup.png      # Initial problem visualization
-├── lacam2_final.gif              # Animated collision-free solution
-└── Readme.md                     # This documentation
+ -MAPF_LaCAM2_Guided_Demo.ipynb # Complete implementation notebook
+ -lacam2_problem_setup.png      # Initial problem visualization
+ -lacam2_final.gif              # Animated collision-free solution
+ -Readme.md                     # This documentation
 
 
 ## 🎯 Use Cases
