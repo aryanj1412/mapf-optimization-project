@@ -17,7 +17,7 @@ This demo illustrates core network flow concepts:
 ## 📊 Visualization
 
 <div align="center">
-  <img src="network_flow_visualization.jpeg" alt="Multi-Commodity Network Flow" width="900"/>
+  <img src="network_flow_visualization.png" alt="Multi-Commodity Network Flow" width="900"/>
   <p><i>Left: Network structure (50 nodes, 146 edges) with capacities (C) and costs ($). Right: 10 commodity OD pairs with demand values (d).</i></p>
 </div>
 
