@@ -27,91 +27,87 @@ Based on classical discrete optimization approaches where each agent’s positio
 
 ## Algorithm Overview
 
-### Decision Variables
+# Mathematical Formulation
 
-For each agent \(i\), vertex \(v\), and time \(t\):
+## Variables
 
-\[
-x_{i,v,t} = 
+$$
+x_{i,v,t} =
 \begin{cases}
 1 & \text{if agent } i \text{ is at vertex } v \text{ at time } t \\
 0 & \text{otherwise}
 \end{cases}
-\]
+$$
 
-\[
-g_{i,t} = 
+$$
+g_{i,t} =
 \begin{cases}
 1 & \text{if agent } i \text{ reaches goal at time } t \\
 0 & \text{otherwise}
 \end{cases}
-\]
+$$
 
-\[
-a_{i,t} = 
+$$
+a_{i,t} =
 \begin{cases}
 1 & \text{if agent } i \text{ is active at time } t \\
 0 & \text{otherwise}
 \end{cases}
-\]
+$$
 
 ---
 
-### Objective
+## Objective
 
-\[
-\text{Minimize: } \sum_{i} \sum_{t=1}^{T} t \cdot g_{i,t}
-\quad \text{(sum-of-costs objective)}
-\]
+$$
+\text{Minimize: } \sum_i \sum_{t=1}^{T} t \cdot g_{i,t} \quad \text{(sum-of-costs objective)}
+$$
 
 ---
 
-### Constraints
+## Constraints
 
 1. **Initial Conditions**
-   \[
+   $$
    x_{i,s_i,0} = 1, \quad a_{i,0} = 1 \quad \forall i
-   \]
+   $$
 
 2. **Goal Conditions**
-   \[
-   \sum_{t=0}^{T} g_{i,t} = 1 \quad \forall i
-   \]
-   \[
-   g_{i,t} \leq x_{i,goal_i,t} \quad \forall i,t
-   \]
+   $$
+   \sum_{t=0}^{T} g_{i,t} = 1 \quad \forall i, \quad g_{i,t} \le x_{i,goal_i,t} \quad \forall i,t
+   $$
 
 3. **Flow Conservation**
-   \[
+   $$
    \sum_{v \in V} x_{i,v,t} = a_{i,t} \quad \forall i,t
-   \]
+   $$
 
 4. **Movement Constraints**
-   \[
-   x_{i,v,t+1} \leq \sum_{u \in N(v)} x_{i,u,t} \quad \forall i,v,t
-   \]
+   $$
+   x_{i,v,t+1} \le \sum_{u \in N(v)} x_{i,u,t} \quad \forall i,v,t
+   $$
 
 5. **Vertex Collision Avoidance**
-   \[
-   \sum_{i} x_{i,v,t} \leq 1 \quad \forall v,t
-   \]
+   $$
+   \sum_i x_{i,v,t} \le 1 \quad \forall v,t
+   $$
 
 6. **Edge Collision Avoidance**
-   \[
-   x_{i,u,t} + x_{j,v,t} + x_{i,v,t+1} + x_{j,u,t+1} \leq 3
-   \quad \forall i \neq j, (u,v) \in E, t
-   \]
-   (Prevents agents from swapping positions)
+   $$
+   x_{i,u,t} + x_{j,v,t} + x_{i,v,t+1} + x_{j,u,t+1} \le 3
+   \quad \forall i \ne j, (u,v) \in E, t
+   $$
+   *(Prevents agents from swapping positions)*
 
 7. **Active Agent Constraints**
-   \[
-   a_{i,t+1} \leq a_{i,t}
-   \]
-   \[
-   a_{i,t} \leq 1 - \sum_{s=0}^{t-1} g_{i,s}
-   \]
+   $$
+   a_{i,t+1} \le a_{i,t}, \quad
+   a_{i,t} \le 1 - \sum_{s=0}^{t-1} g_{i,s}
+   $$
 
 ---
+
+
 
 ## Implementation Details
 
