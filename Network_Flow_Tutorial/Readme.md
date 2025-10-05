@@ -2,8 +2,7 @@
 
 This directory contains an **educational demonstration** of classical multi-commodity network flow optimization, serving as a conceptual primer before diving into the MAPF-specific time-expanded formulation.
 
-> **Note:** This is **NOT** the main MAPF Network Flow implementation. For the actual MAPF solver using time-expanded graphs, see: [`Network_Flow_Implementation/`](../Network_Flow_Implementation/)
-
+> **Note:** This is **NOT** the main MAPF Network Flow implementation.
 ## 🎯 Purpose
 
 This demo illustrates core network flow concepts:
@@ -125,12 +124,6 @@ Minimize total flow cost: \(\min \sum_{k} \sum_{(i,j)} c_{ij} f_{ij}^k\)
 4. **Gao et al. (2023):** *Multi-Agent Path Finding with Time Windows*  
    AAMAS-23. [[PDF]](https://www.ifaamas.org/Proceedings/aamas2023/pdfs/p2586.pdf)
 
-## 🔗 Related Directories
-
-- **Main MAPF Network Flow:** [`Network_Flow_Implementation/`](../Network_Flow_Implementation/) - Time-expanded MAPF solver ⭐
-- **MILP Implementation:** [`MILP_Implementation/`](../MILP_Implementation/) - Exact integer programming
-- **LaCAM2 Baseline:** [`LaCAM2_Baseline/`](../LaCAM2_Baseline/) - Optimal search-based solver
-- **Hybrid Approaches:** [`Hybrid_Approaches/`](../Hybrid_Approaches/) - Combined methods
 
 ## 🙏 Acknowledgments
 
