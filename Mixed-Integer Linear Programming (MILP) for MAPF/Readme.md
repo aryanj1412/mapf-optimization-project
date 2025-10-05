@@ -1,183 +1,193 @@
-# Mixed-Integer Linear Programming (MILP) for MAPF
+# Mixed-Integer Linear Programming (MILP) for Multi-Agent Path Finding (MAPF)
 
-This directory contains a complete **Mixed-Integer Linear Programming** implementation for Multi-Agent Path Finding using time-indexed binary variables with the open-source **PuLP** solver.
+This directory contains a complete **Mixed-Integer Linear Programming (MILP)** implementation for the **Multi-Agent Path Finding (MAPF)** problem, using **time-indexed binary variables** and the open-source **PuLP** solver.
 
-> **Exact Optimal Solutions:** MILP provides provably optimal solutions with integer decision variables, serving as the gold standard for small to medium MAPF instances.
+> **Exact Optimal Solutions:**  
+> MILP provides provably optimal solutions with integer decision variables, serving as the gold standard for small to medium MAPF instances.
 
-## 📚 Research Background
+---
+
+## Research Background
 
 ### Time-Indexed MILP Formulation
 
-**Foundation:** Based on classical discrete optimization approaches to MAPF where each agent's position at each timestep is modeled as a binary decision variable.
+**Foundation:**  
+Based on classical discrete optimization approaches where each agent’s position at every timestep is modeled as a binary decision variable.
 
-**Key Papers:**
+**Key References:**
 
-1. **Gao et al. (2023):** *Multi-Agent Path Finding with Time Windows*  
-   AAMAS-23. [[PDF]](https://www.ifaamas.org/Proceedings/aamas2023/pdfs/p2586.pdf)
+1. **Gao et al. (2023)** – *Multi-Agent Path Finding with Time Windows*, AAMAS-23  
+   [PDF](https://www.ifaamas.org/Proceedings/aamas2023/pdfs/p2586.pdf)
+2. **Yu & LaValle (2013)** – *Optimal Multirobot Path Planning on Graphs*, IEEE Transactions on Robotics  
+   [Link](https://ieeexplore.ieee.org/document/6582929)
+3. **Erdem et al. (2013)** – *Integer Programming for Automated Multi-Agent Path Finding*, AAAI-13  
+   [Link](https://www.aaai.org/ocs/index.php/AAAI/AAAI13/paper/view/6347)
 
-2. **Yu & LaValle (2013):** *Optimal Multirobot Path Planning on Graphs*  
-   IEEE Transactions on Robotics. [[Link]](https://ieeexplore.ieee.org/document/6582929)
+---
 
-3. **Erdem et al. (2013):** *Integer Programming for Automated Multi-Agent Path Finding*  
-   AAAI-13. [[Link]](https://www.aaai.org/ocs/index.php/AAAI/AAAI13/paper/view/6347)
+## Algorithm Overview
 
-### Algorithm Overview
-
-**Decision Variables:**
+### Decision Variables
 
 For each agent \(i\), vertex \(v\), and time \(t\):
 
 \[
-x_{i,v,t} = \begin{cases}
+x_{i,v,t} = 
+\begin{cases}
 1 & \text{if agent } i \text{ is at vertex } v \text{ at time } t \\
 0 & \text{otherwise}
 \end{cases}
 \]
 
 \[
-g_{i,t} = \begin{cases}
+g_{i,t} = 
+\begin{cases}
 1 & \text{if agent } i \text{ reaches goal at time } t \\
 0 & \text{otherwise}
 \end{cases}
 \]
 
 \[
-a_{i,t} = \begin{cases}
+a_{i,t} = 
+\begin{cases}
 1 & \text{if agent } i \text{ is active at time } t \\
 0 & \text{otherwise}
 \end{cases}
 \]
 
-**Mathematical Formulation:**
+---
 
-**Minimize:**
+### Objective
+
 \[
-\sum_{i} \sum_{t=1}^{T} t \cdot g_{i,t} \quad \text{(sum-of-costs)}
+\text{Minimize: } \sum_{i} \sum_{t=1}^{T} t \cdot g_{i,t}
+\quad \text{(sum-of-costs objective)}
 \]
 
-**Subject to:**
+---
 
-1. **Initial Conditions:**
+### Constraints
+
+1. **Initial Conditions**
    \[
    x_{i,s_i,0} = 1, \quad a_{i,0} = 1 \quad \forall i
    \]
 
-2. **Goal Conditions:**
+2. **Goal Conditions**
    \[
-   \sum_{t=0}^{T} g_{i,t} = 1 \quad \forall i \quad \text{(reach goal exactly once)}
+   \sum_{t=0}^{T} g_{i,t} = 1 \quad \forall i
    \]
    \[
-   g_{i,t} \leq x_{i,goal_i,t} \quad \forall i,t \quad \text{(goal indicator)}
-   \]
-
-3. **Flow Conservation:**
-   \[
-   \sum_{v \in V} x_{i,v,t} = a_{i,t} \quad \forall i,t \quad \text{(active agents occupy exactly one vertex)}
+   g_{i,t} \leq x_{i,goal_i,t} \quad \forall i,t
    \]
 
-4. **Movement Constraints:**
+3. **Flow Conservation**
    \[
-   x_{i,v,t+1} \leq \sum_{u \in N(v)} x_{i,u,t} \quad \forall i,v,t \quad \text{(only move to neighbors)}
+   \sum_{v \in V} x_{i,v,t} = a_{i,t} \quad \forall i,t
    \]
 
-5. **Vertex Collision Avoidance:**
+4. **Movement Constraints**
    \[
-   \sum_{i} x_{i,v,t} \leq 1 \quad \forall v,t \quad \text{(at most one agent per vertex)}
+   x_{i,v,t+1} \leq \sum_{u \in N(v)} x_{i,u,t} \quad \forall i,v,t
    \]
 
-6. **Edge Collision Avoidance:**
+5. **Vertex Collision Avoidance**
    \[
-   x_{i,u,t} + x_{j,v,t} + x_{i,v,t+1} + x_{j,u,t+1} \leq 3 \quad \forall i \neq j, (u,v) \in E, t
+   \sum_{i} x_{i,v,t} \leq 1 \quad \forall v,t
+   \]
+
+6. **Edge Collision Avoidance**
+   \[
+   x_{i,u,t} + x_{j,v,t} + x_{i,v,t+1} + x_{j,u,t+1} \leq 3
+   \quad \forall i \neq j, (u,v) \in E, t
    \]
    (Prevents agents from swapping positions)
 
-7. **Active Agent Constraints:**
+7. **Active Agent Constraints**
    \[
-   a_{i,t+1} \leq a_{i,t} \quad \forall i,t \quad \text{(once inactive, stay inactive)}
+   a_{i,t+1} \leq a_{i,t}
    \]
    \[
-   a_{i,t} \leq 1 - \sum_{s=0}^{t-1} g_{i,s} \quad \forall i,t \quad \text{(inactive after goal)}
+   a_{i,t} \leq 1 - \sum_{s=0}^{t-1} g_{i,s}
    \]
 
-## 🛠️ Implementation Details
+---
 
-### Architecture
+## Implementation Details
 
-**Class Structure:**
-Agent # Dataclass: id, start, goal
-MAPF_Instance # Grid, agents, obstacles, graph generation
+### Architecture Overview
+
+| Class / Function | Description |
+|------------------|-------------|
+| **Agent** | Dataclass containing `id`, `start`, and `goal` |
+| **MAPF_Instance** | Manages grid, agents, obstacles, and graph generation |
 
 ### Core Components
 
 | Component | Purpose |
-|-----------|---------|
-| **gen_vertices()** | Generate free vertices (excluding obstacles) |
-| **gen_edges()** | Create 4-connected grid graph |
-| **get_nbr()** | Return neighbors (including wait action) |
-| **create_vars()** | Initialize binary variables (x, g, a) |
-| **create_obj()** | Set sum-of-costs objective |
-| **add_constr()** | Add all constraints to model |
-| **solve()** | Invoke CBC solver with time limit |
-| **extract_sol()** | Parse solution into agent paths |
-| **visualize_sol()** | Generate path visualization |
+|-----------|----------|
+| `gen_vertices()` | Generate free vertices (excluding obstacles) |
+| `gen_edges()` | Create 4-connected grid graph |
+| `get_nbr()` | Return neighbors (including wait action) |
+| `create_vars()` | Initialize binary variables (x, g, a) |
+| `create_obj()` | Define the sum-of-costs objective |
+| `add_constr()` | Add all constraints to the MILP model |
+| `solve()` | Invoke CBC solver with time limit |
+| `extract_sol()` | Parse solver output into agent paths |
+| `visualize_sol()` | Visualize the resulting paths |
 
 ### Constraint Breakdown
 
-7 constraint types implemented:
-initial_conditions() # Start positions
+1. `initial_conditions()` – Start positions  
+2. `goal_conditions()` – Goal timing and uniqueness  
+3. `active_agent_constr()` – Agent activation states  
+4. `flow_conservation()` – One position per active agent  
+5. `mov_constr()` – Valid movement transitions  
+6. `vertex_collision_avoid()` – No two agents at same vertex  
+7. `edge_collision_avoid()` – No edge swaps  
 
-goal_conditions() # Goal timing and uniqueness
+---
 
-active_agent_constr() # Agent activation state
-
-flow_conservation() # One position per active agent
-
-mov_constr() # Valid movement transitions
-
-vertex_collision_avoid() # No two agents at same vertex
-
-edge_collision_avoid() # No swapping positions
-
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Component | Version | Purpose |
-|-----------|---------|---------|
+|-----------|----------|---------|
 | **Python** | 3.8+ | Core implementation |
-| **PuLP** | 2.7+ | MILP modeling library |
+| **PuLP** | 2.7+ | MILP modeling |
 | **CBC** | 2.10+ | Open-source MILP solver (bundled with PuLP) |
 | **NumPy** | 1.21+ | Array operations |
 | **Matplotlib** | 3.5+ | Visualization |
 
-**Why PuLP + CBC?**
-- ✅ **Open-source**: No license required (unlike Gurobi)
-- ✅ **Easy installation**: `pip install pulp`
-- ✅ **Good performance**: CBC competitive for small-medium instances
-- ✅ **Python-native**: Clean API for constraint programming
+### Why PuLP + CBC?
 
-## 📊 Test Instance: 7 Agents, 10×10 Grid
+- **Open-source:** No commercial license needed  
+- **Simple installation:** `pip install pulp`  
+- **Good performance:** CBC is competitive for small–medium MAPF instances  
+- **Python-native:** Clean, readable API  
+
+---
+
+## Example: 7 Agents on a 10×10 Grid
 
 ### Problem Setup
 
 
 agents = [
-Agent(id=0, start=(1,0), goal=(3,9)),
-Agent(id=1, start=(9,1), goal=(1,8)),
-Agent(id=2, start=(3,3), goal=(9,8)),
-Agent(id=3, start=(8,5), goal=(3,1)),
-Agent(id=4, start=(5,7), goal=(8,2)),
-Agent(id=5, start=(1,7), goal=(7,0)),
-Agent(id=6, start=(8,9), goal=(0,2))
+    Agent(id=0, start=(1,0), goal=(3,9)),
+    Agent(id=1, start=(9,1), goal=(1,8)),
+    Agent(id=2, start=(3,3), goal=(9,8)),
+    Agent(id=3, start=(8,5), goal=(3,1)),
+    Agent(id=4, start=(5,7), goal=(8,2)),
+    Agent(id=5, start=(1,7), goal=(7,0)),
+    Agent(id=6, start=(8,9), goal=(0,2))
 ]
 
-obstacles = [(3,0), (8,0), (9,0), (5,1), (1,3), (5,4),
-(6,4), (9,4), (2,5), (3,7), (7,7), (0,8),
-(6,8), (0,9), (5,9), (9,9)]
-**Instance Statistics:**
-- **Grid:** 10×10 (100 cells)
-- **Free vertices:** 84 (after obstacles)
-- **Agents:** 7
-- **Obstacles:** 16
-- **Time horizon:** 15 timesteps
+obstacles = [
+    (3,0), (8,0), (9,0), (5,1), (1,3), (5,4),
+    (6,4), (9,4), (2,5), (3,7), (7,7), (0,8),
+    (6,8), (0,9), (5,9), (9,9)
+]
+
 
 ### Problem Complexity
 
