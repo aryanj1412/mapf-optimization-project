@@ -132,8 +132,8 @@ Optimality: ✓ Guaranteed optimal
 
 ## 📁 Files in This Directory
 
-``text
-LaCAM2_Baseline/
+
+LaCAM2_Baseline
 ├── MAPF_LaCAM2_Guided_Demo.ipynb # Complete implementation notebook
 ├── lacam2_problem_setup.png      # Initial problem visualization
 ├── lacam2_final.gif              # Animated collision-free solution
