@@ -104,7 +104,7 @@ Input: Grid, Agents, Obstacles, Threshold
 ### Test Case 1: Sparse Distribution (7 agents, 10×10 grid)
 
 <div align="center">
-  <img src="Hybridc1.jpeg" alt="Hybrid C Sparse Case" width="100%"/>
+  <img src="Hybridc1.png" alt="Hybrid C Sparse Case" width="100%"/>
   <p><i>Figure 1: Sparse scenario where NO congestion is detected. All 16 regions (green) use fast prioritized planning. Solve time: 0.00s.</i></p>
 </div>
 
@@ -130,7 +130,7 @@ text
 ### Test Case 2: Bottleneck Scenario (6 agents forced through narrow corridor)
 
 <div align="center">
-  <img src="Hybridc2.jpeg" alt="Hybrid C Bottleneck Case" width="100%"/>
+  <img src="Hybridc2.png" alt="Hybrid C Bottleneck Case" width="100%"/>
   <p><i>Figure 2: Bottleneck scenario with forced congestion. 2 regions (red) use MILP for optimal routing, 14 regions (green) use fast planning. Solve time: 0.75s.</i></p>
 </div>
 
