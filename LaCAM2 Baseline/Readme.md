@@ -76,5 +76,4 @@ LaCAM2 (LaCAM*) is an **anytime search-based algorithm** that combines the speed
 - **`lacam2_final.gif`** - Animated solution showing collision-free paths
 - **`Readme.md`** - This documentation
 
-### Dependencies
 
