@@ -130,14 +130,15 @@ Optimality: ✓ Guaranteed optimal
 | PIBT | 10 | 32×32 | <0.1 | ~250 | ❌ No |
 
 
-
 ## 📁 Files in This Directory
 
+``text
 LaCAM2_Baseline/
 ├── MAPF_LaCAM2_Guided_Demo.ipynb # Complete implementation notebook
-├── lacam2_problem_setup.png # Initial problem visualization
-├── lacam2_final.gif # Animated collision-free solution
-└── Readme.md # This documentation
+├── lacam2_problem_setup.png      # Initial problem visualization
+├── lacam2_final.gif              # Animated collision-free solution
+└── Readme.md                     # This documentation
+
 
 ## 🎯 Use Cases
 
