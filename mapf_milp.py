@@ -51,6 +51,13 @@ class MAPF_Instance:
                 nbrs.append(nbr)
         return nbrs
 
+    def compute_min_individual_paths(self) -> int:
+        max_individual_path = 0
+        for agent in self.agents:
+            min_dist = abs(agent.start[0] - agent.goal[0]) + abs(agent.start[1] - agent.goal[1])
+            max_individual_path = max(max_individual_path, min_dist)
+        return max_individual_path
+
 class MAPF_MILP_Solver:
     def __init__(self, instance: MAPF_Instance, time_horizon: int  = 15, obj_type: str = "sum_of_costs"):
         self.instance = instance
@@ -58,6 +65,8 @@ class MAPF_MILP_Solver:
         self.obj_type = obj_type
         self.model = None
         self.x_vars = {}
+        self.g_vars = {}
+        self.a_vars = {}
         self.sol_paths = {}
         self.sol_time = 0
         self.is_opt = False
@@ -75,18 +84,29 @@ class MAPF_MILP_Solver:
                     var_name = f"x_{i}_{v[0]}_{v[1]}_{t}"
                     self.x_vars[(i, v, t)] = pulp.LpVariable(var_name, cat= "Binary")
 
+        for i, agent in enumerate(self.instance.agents):
+            for t in range(self.T + 1):
+                var_name = f"g_{i}_{t}"
+                self.g_vars[(i, t)] = pulp.LpVariable(var_name, cat="Binary")
+
+        for i, agent in enumerate(self.instance.agents):
+            for t in range(self.T + 1):
+                var_name = f"a_{i}_{t}"
+                self.a_vars[(i, t)] = pulp.LpVariable(var_name, cat="Binary")
+
     def create_obj(self):
         obj = pulp.lpSum([
-            t * self.x_vars[(i, agent.goal, t)]
+            t * self.g_vars[(i, t)]
             for i, agent in enumerate(self.instance.agents)
             for t in range(1, self.T + 1)
         ])
         self.model += obj
 
     def add_constr(self):
-        self.flow_conservation()
         self.initial_conditions()
         self.goal_conditions()
+        self.active_agent_constr()
+        self.flow_conservation()
         self.mov_constr()
         self.vertex_collision_avoid()
         self.edge_collision_avoid()
@@ -96,12 +116,14 @@ class MAPF_MILP_Solver:
             for t in range(self.T + 1):
                 constr = pulp.lpSum([
                     self.x_vars[(i, v, t)] for v in self.instance.vertices
-                ]) == 1
+                ]) == self.a_vars[(i, t)]
                 self.model += constr, f"Flow_conservation agent {i} time {t}"
 
     def initial_conditions(self):
         for i, agent in enumerate(self.instance.agents):
             self.model += self.x_vars[(i, agent.start, 0)] == 1, f"Initial_Agent {i}"
+
+            self.model += self.a_vars[(i, 0)] == 1, f"Initially_active_{i}"
 
             for v in self.instance.vertices:
                 if v!= agent.start:
@@ -110,14 +132,25 @@ class MAPF_MILP_Solver:
     def goal_conditions(self):
         for i, agent in enumerate(self.instance.agents):
             constr = pulp.lpSum([
-                self.x_vars[(i, agent.goal, t)] for t in range(self.T + 1)
-            ]) >= 1
-            self.model += constr, f"Goal_reached_agent {i}"
+                self.g_vars[(i, t)] for t in range(self.T + 1)
+            ]) == 1
+            self.model += constr, f"Goal_reached_once_{i}"
+
+            for t in range(self.T +1):
+                self.model += self.g_vars[(i, t)] <= self.x_vars[(i, agent.goal, t)], f"Goal_reached_{i}_{t}"
+
+            for t in range(1, self.T +1):
+                prev_goals = pulp.lpSum([self.g_vars[(i, s)] for s in range(t)])
+                self.model += self.g_vars[(i, t)] <= 1 - prev_goals, f"goal_reached_once_{i}_{t}"
+
+    def active_agent_constr(self):
+        for i, agent in enumerate(self.instance.agents):
+            for t in range(1, self.T + 1):
+                goal_so_far = pulp.lpSum([self.g_vars[(i, s)] for s in range(t)])
+                self.model += (self.a_vars[(i, t)] <= 1 - goal_so_far), f"inactive_after_goal_{i}_{t}"
 
             for t in range(self.T):
-                self.model += (
-                    self.x_vars[(i, agent.goal, t)] <= self.x_vars[(i, agent.goal, t + 1)]
-                ), f"stays_at_goal {i}_time_{t}"
+                self.model += self.a_vars[(i, t+1)] <= self.a_vars[(i, t)], f"Stay_inactive_{i}_{t}"
 
     def mov_constr(self):
         for i in range(len(self.instance.agents)):
@@ -156,7 +189,7 @@ class MAPF_MILP_Solver:
         start_time = time.time()
         if verbose:
             print(f"solving MAPF instance with {len(self.instance.agents)} agents...")
-            print(f"Variables: {len(self.x_vars)}, Time horizon: {self.T}")
+            print(f"Variables: {len(self.x_vars) + len(self.g_vars) + len(self.a_vars)}, Time horizon: {self.T}")
 
         solver = pulp.PULP_CBC_CMD(timeLimit= time_limit, msg= verbose)
         status = self.model.solve(solver)
@@ -176,13 +209,23 @@ class MAPF_MILP_Solver:
 
     def extract_sol(self):
         self.sol_paths = {i: [] for i in range(len(self.instance.agents))}
+        self.goal_times = {}
 
         for i in range(len(self.instance.agents)):
-            for t in range(self.T +1):
-                for v in self.instance.vertices:
-                    if self.x_vars[(i, v, t)].varValue == 1:
-                        self.sol_paths[i].append(v)
-                        break
+            goal_time = None
+            for t in range(self.T + 1):
+                if self.g_vars[(i, t)].varValue == 1:
+                    goal_time = t
+                    break
+
+            self.goal_times[i] = goal_time
+
+            if goal_time is not None:
+                for t in range(goal_time +1):
+                    for v in self.instance.vertices:
+                        if self.x_vars[(i, v, t)].varValue == 1:
+                            self.sol_paths[i].append(v)
+                            break
 
     def sol_metrics(self) -> Dict[str, float]:
         if not self.sol_paths:
@@ -191,11 +234,8 @@ class MAPF_MILP_Solver:
         metrics = {}
         sum_of_costs = 0
         for i, agent in enumerate(self.instance.agents):
-            path = self.sol_paths[i]
-            for t, pos in enumerate(path):
-                if pos == agent.goal:
-                    sum_of_costs += t
-                    break
+            path_length = len(self.sol_paths[i]) - 1
+            sum_of_costs += path_length
 
         metrics['sum_of_costs'] = sum_of_costs
         metrics['solve_time'] = self.solve_time
@@ -207,7 +247,7 @@ class MAPF_MILP_Solver:
             print("No Solution to visualize")
             return
 
-        fig, ax = plt.subplots(1, 1, figsize=(12,10))
+        fig, ax = plt.subplots(1, 1, figsize=(12,12))
 
         for x in range(self.instance.width +1):
             ax.axvline(x-0.5, color='lightgray', linewidth=0.5)
@@ -223,6 +263,7 @@ class MAPF_MILP_Solver:
         for i, agent in enumerate(self.instance.agents):
             color = colors[i]
             path = self.sol_paths[i]
+            path_length = len(path) - 1
 
             ax.plot(agent.start[0], agent.start[1], 'o', color=color,
                     markersize=15, label=f'Agent {i} start', markeredgecolor='black', markeredgewidth=2)
@@ -253,14 +294,18 @@ class MAPF_MILP_Solver:
 
 def example() -> MAPF_Instance:
     agents = [
-        Agent(id=0, start=(0,0), goal=(7,6)),
-        Agent(id=1, start=(6,2), goal=(3,7)),
-        Agent(id=2, start=(5,7), goal=(4,0))
+        Agent(id=0, start=(1,0), goal=(3,9)),
+        Agent(id=1, start=(9,1), goal=(1,8)),
+        Agent(id=2, start=(3,3), goal=(9,8)),
+        Agent(id=3, start=(8,5), goal=(3,1)),
+        Agent(id=4, start=(5,7), goal=(8,2)),
+        Agent(id=5, start=(1,7), goal=(7,0)),
+        Agent(id=6, start=(8,9), goal=(0,2))
     ]
 
-    obst = [(2,0), (6,0), (7,0), (3,2), (0,3), (4,3), (6,3), (0,4), (2,4), (2,5), (4,5), (0,7), (1,7), (7,7)]
+    obst = [(3,0), (8,0), (9,0), (5,1), (1,3), (5,4), (6,4), (9,4), (2,5), (3,7), (7,7), (0,8), (6,8), (0,9), (5,9), (9,9)]
 
-    return MAPF_Instance(width=8, height=8, agents=agents, obst=obst)
+    return MAPF_Instance(width=10, height=10, agents=agents, obst=obst)
 
 def run_example():
     print("Running MAPF MILP Example:")
@@ -287,8 +332,8 @@ def run_example():
         return solver
 
     else:
-        print("Failed to find solution.")
+        print("Failed to find solution. Increase time horizon.")
         return None
 
 if __name__ == "__main__":
-    solver = run_example()
+    solver1 = run_example()
