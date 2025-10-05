@@ -129,97 +129,7 @@ Optimality: ✓ Guaranteed optimal
 | CBS | 10 | 32×32 | ~5 | 232 | ✅ Yes |
 | PIBT | 10 | 32×32 | <0.1 | ~250 | ❌ No |
 
-## 🔧 Installation & Setup
 
-### Quick Start (Google Colab)
-
-**CELL 1: Install system dependencies**
-!apt-get update
-!apt-get install -y build-essential cmake libboost-all-dev git
-
-text
-
-**CELL 2: Clone and build**
-!git clone --recursive https://github.com/nobodyczcz/Guided-PIBT.git
-%cd Guided-PIBT/guided-lacam2
-
-!cmake -B build -DGUIDANCE=ON -DCMAKE_BUILD_TYPE=RELEASE -DOBJECTIVE=3
-!make -C build -j$(nproc)
-
-text
-
-**CELL 3: Run benchmark**
-!./build/main
--m assets/random-32-32-10.map
--i assets/random-32-32-10-random-1.scen
--N 10 -t 60 -v 1 -O 3
-
-text
-
-### Local Installation (Linux/macOS)
-
-**1. Install dependencies**
-Ubuntu/Debian:
-sudo apt-get update
-sudo apt-get install -y build-essential cmake libboost-all-dev
-
-macOS:
-brew install cmake boost
-
-text
-
-**2. Clone repository**
-git clone --recursive https://github.com/nobodyczcz/Guided-PIBT.git
-cd Guided-PIBT/guided-lacam2
-
-text
-
-**3. Build**
-cmake -B build -DGUIDANCE=ON -DCMAKE_BUILD_TYPE=RELEASE
-make -C build -j$(nproc)
-
-text
-
-**4. Test**
-./build/main
--m assets/random-32-32-10.map
--i assets/random-32-32-10-random-1.scen
--N 10 -t 60 -v 1 -O 3
-
-text
-
-### Command Line Usage
-
-./build/main [OPTIONS]
-
-text
-
-**Required Arguments:**
-- `-m <file>` - Map file path (.map format)
-- `-i <file>` - Scenario file (.scen format)
-- `-N <int>` - Number of agents
-
-**Optional Arguments:**
-- `-t <int>` - Time limit in seconds (default: 30)
-- `-v <0-3>` - Verbosity level (0=quiet, 3=verbose)
-- `-O <0-3>` - Objective function:
-  - `0`: Makespan
-  - `1`: Sum of Loss
-  - `2`: Flowtime
-  - `3`: Sum-of-costs
-- `-o <file>` - Output solution file
-
-**Example:**
-./build/main
--m map.map
--i scenario.scen
--N 50
--t 120
--v 2
--O 3
--o solution.txt
-
-text
 
 ## 📁 Files in This Directory
 
@@ -229,8 +139,6 @@ LaCAM2_Baseline/
 ├── lacam2_final.gif # Animated collision-free solution
 └── Readme.md # This documentation
 
-text
-undefined
 ## 🎯 Use Cases
 
 ### As Optimal Baseline
