@@ -68,44 +68,39 @@ $$
 ## Constraints
 
 1. **Initial Conditions**
-   $$
-   x_{i,s_i,0} = 1, \quad a_{i,0} = 1 \quad \forall i
-   $$
+
+    $$x_{i,s_i,0} = 1,\quad a_{i,0} = 1 \quad \forall i$$
 
 2. **Goal Conditions**
-   $$
-   \sum_{t=0}^{T} g_{i,t} = 1 \quad \forall i, \quad g_{i,t} \le x_{i,goal_i,t} \quad \forall i,t
-   $$
+
+    $$\sum_{t=0}^{T} g_{i,t} = 1 \quad \forall i$$
+
+    $$g_{i,t} \le x_{i,\text{goal}_i,t} \quad \forall i,t$$
 
 3. **Flow Conservation**
-   $$
-   \sum_{v \in V} x_{i,v,t} = a_{i,t} \quad \forall i,t
-   $$
+
+    $$\sum_{v \in V} x_{i,v,t} = a_{i,t} \quad \forall i,t$$
 
 4. **Movement Constraints**
-   $$
-   x_{i,v,t+1} \le \sum_{u \in N(v)} x_{i,u,t} \quad \forall i,v,t
-   $$
+
+    $$x_{i,v,t+1} \le \sum_{u \in N(v)} x_{i,u,t} \quad \forall i,v,t$$
 
 5. **Vertex Collision Avoidance**
-   $$
-   \sum_i x_{i,v,t} \le 1 \quad \forall v,t
-   $$
+
+    $$\sum_{i} x_{i,v,t} \le 1 \quad \forall v,t$$
 
 6. **Edge Collision Avoidance**
-   $$
-   x_{i,u,t} + x_{j,v,t} + x_{i,v,t+1} + x_{j,u,t+1} \le 3
-   \quad \forall i \ne j, (u,v) \in E, t
-   $$
-   *(Prevents agents from swapping positions)*
+
+    $$x_{i,u,t} + x_{j,v,t} + x_{i,v,t+1} + x_{j,u,t+1} \le 3
+    \quad \forall i \ne j,\ (u,v) \in E,\ t$$
+
+    *(Prevents agents from swapping positions.)*
 
 7. **Active Agent Constraints**
-   $$
-   a_{i,t+1} \le a_{i,t}, \quad
-   a_{i,t} \le 1 - \sum_{s=0}^{t-1} g_{i,s}
-   $$
 
----
+    $$a_{i,t+1} \le a_{i,t}$$
+
+    $$a_{i,t} \le 1 - \sum_{s=0}^{t-1} g_{i,s}$$
 
 
 
