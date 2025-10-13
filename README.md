@@ -39,19 +39,19 @@ The central focus is on **hybrid approaches** combining the strengths of both MI
 This comprehensive approach balances efficiency with solution quality, demonstrating how exact and approximate methods complement one another in solving MAPF across varying problem scales.
 
 ### Applications
-- 🤖 Warehouse robotics and automated fulfillment
-- 🚗 Autonomous vehicle coordination
-- ✈️ Airport ground traffic management
-- 🎮 Multi-agent game AI
+- Warehouse robotics and automated fulfillment
+- Autonomous vehicle coordination
+- Airport ground traffic management
+- Multi-agent game AI
 
-## ✨ Features
+## Features
 
-- ✅ **Complete Network Flow MAPF Solver** using Gurobi LP
-- ✅ **LaCAM2 Baseline** - State-of-the-art anytime search algorithm
-- ✅ **Automated Visualization** - Timestep-by-timestep GIF animations
-- ✅ **Collision Detection** - Comprehensive vertex and edge conflict checking
-- ✅ **Scalability Analysis** - Performance metrics and computational limits
-- ✅ **Space-Time A*** - Prioritized planning for larger instances
+- **Complete Network Flow MAPF Solver** using Gurobi LP
+- **LaCAM2 Baseline** - State-of-the-art anytime search algorithm
+- **Automated Visualization** - Timestep-by-timestep GIF animations
+- **Collision Detection** - Comprehensive vertex and edge conflict checking
+- **Scalability Analysis** - Performance metrics and computational limits
+- **Space-Time A*** - Prioritized planning for larger instances
 -  **MILP Formulation**
 -  **Hybrid A/B/C Methods** 
 
