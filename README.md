@@ -38,6 +38,18 @@ The central focus is on **hybrid approaches** combining the strengths of both MI
 
 This comprehensive approach balances efficiency with solution quality, demonstrating how exact and approximate methods complement one another in solving MAPF across varying problem scales.
 
+Alternately, we explore multiple other algorithms to optimally determine the most suitable algortihm for practical applications. These include:-
+
+| Category                   | Algorithms                                                           |
+| -------------------------- | -------------------------------------------------------------------- |
+| **Search-Based (Optimal)** | CBS, ICBS, ICTS, M*, MAPF-LNS (optimal variants), WHCA* (suboptimal) |
+| **Conflict-Based**         | CBS, ICBS, EECBS, MAPF-LNS, LACAM2/3, NETWORKFLOW                    |
+| **SAT/SMT/MILP**           | SAT, SMT, MILP                                                       |
+| **Swapping/Rule-Based**    | Push and Swap, Push and Rotate, PIBT, PIBT+                          |
+| **Metaheuristics (LNS)**   | MAPF-LNS, LNS2                                                       |
+| **Learning-Based**         | PRIMAL                                                               |
+
+
 ### Applications
 - Warehouse robotics and automated fulfillment
 - Autonomous vehicle coordination
