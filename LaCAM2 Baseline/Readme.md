@@ -195,5 +195,5 @@ We thank **Keisuke Okumura** for developing LaCAM2 and **Zhe Chen et al.** for t
 
 ---
 
-**Contributors:** Akarsh J ([@pacificblaster1708](https://github.com/pacificblaster1708))  
+
 **Last Updated:** October 5, 2025
