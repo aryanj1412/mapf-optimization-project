@@ -134,7 +134,7 @@ Minimize total flow cost: \(\min \sum_{k} \sum_{(i,j)} c_{ij} f_{ij}^k\)
 ---
 
 ---
-**Contributors:** Akarsh J ([@pacificblaster1708](https://github.com/pacificblaster1708))  
+ 
 **Last Updated:** October 5, 2025
 
 
