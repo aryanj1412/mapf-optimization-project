@@ -294,18 +294,23 @@ class MAPF_MILP_Solver:
 
 def example() -> MAPF_Instance:
     agents = [
-        Agent(id=0, start=(1,0), goal=(3,9)),
-        Agent(id=1, start=(9,1), goal=(1,8)),
-        Agent(id=2, start=(3,3), goal=(9,8)),
-        Agent(id=3, start=(8,5), goal=(3,1)),
-        Agent(id=4, start=(5,7), goal=(8,2)),
-        Agent(id=5, start=(1,7), goal=(7,0)),
-        Agent(id=6, start=(8,9), goal=(0,2))
+        Agent(id=0, start=(1, 0), goal=(3, 9)),
+        Agent(id=1, start=(9, 1), goal=(1, 8)),
+        Agent(id=2, start=(3, 3), goal=(9, 8)),
+        Agent(id=3, start=(8, 6), goal=(3, 1)),
+        Agent(id=4, start=(5, 7), goal=(8, 8)),
+        Agent(id=5, start=(1, 9), goal=(7, 1)),
+        Agent(id=6, start=(7, 9), goal=(0, 3)),
+        Agent(id=7, start=(10, 1), goal=(1, 5))
+     ]
+
+    obst = [
+        (0, 2), (0, 10), (1, 2), (1, 7), (1, 11), (2, 0), (2, 2), (2, 5), (3, 5), (3, 6),
+        (3, 11), (4, 4), (6, 5), (6, 7), (6, 8), (7, 0), (7, 6), (7, 11), (8, 2), (8, 5),
+        (8, 7), (8, 10), (9, 11), (10, 2), (10, 11), (11, 10), (11, 11), (5, 8)
     ]
 
-    obst = [(3,0), (8,0), (9,0), (5,1), (1,3), (5,4), (6,4), (9,4), (2,5), (3,7), (7,7), (0,8), (6,8), (0,9), (5,9), (9,9)]
-
-    return MAPF_Instance(width=10, height=10, agents=agents, obst=obst)
+    return MAPF_Instance(width=12, height=12, agents=agents, obst=obst)
 
 def run_example():
     print("Running MAPF MILP Example:")
@@ -314,7 +319,7 @@ def run_example():
     instance = example()
     print(f"Problem:{len(instance.agents)} agents, {len(instance.vertices)} vertices, {len(instance.obst)} obstacles")
 
-    solver = MAPF_MILP_Solver(instance)
+    solver = MAPF_MILP_Solver(instance, time_horizon=25)
     success = solver.solve(verbose=True)
 
     if success:
